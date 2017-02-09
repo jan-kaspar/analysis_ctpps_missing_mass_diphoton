@@ -30,12 +30,27 @@ function PrintUsage()
 	echo "USAGE: submit [option] ..."
 	echo "OPTIONS:"
 	echo "    -h, --help"
-	echo "    -p, -program <program>, default: '$program'"
-	echo "    -input <file>, default: '$input_list_file'"
-	echo "    -min-idx <number>, default: '$min_idx'"
-	echo "    -step <number>, default: '$step'"
-	echo "    -groups <number>, default: '$groups'"
-	echo "    -o, -ouput <output dir>, default: '$output_dir'"
+
+	echo "    -p, -program <program>    program to run"
+	echo "                                  currently: '$program'"
+
+	echo "    -i, -input <file>         file with input list"
+	echo "                                  currently: '$input_list_file'"
+
+	echo "    -min-idx <number>         start index"
+	echo "                                  currently: '$min_idx'"
+
+	echo "    -step <number>            files per job"
+	echo "                                  currently: '$step'"
+
+	echo "    -groups <number>          number of jobs"
+	echo "                                  currently: '$groups'"
+
+	echo "    -o, -ouput <dir>          output directory"
+	echo "                                  currently: '$output_dir'"
+
+	echo "    -q <queue>                LXBATCH queue"
+	echo "                                  currently: '$batch_queue'"
 }
 
 #----------------------------------------------------------------------------------------------------
@@ -54,7 +69,7 @@ do
 			program="$1"
 		;;
 
-		"-input")
+		"-i" | "-input")
 			shift
 			input_list_file="$1"
 		;;
@@ -77,6 +92,11 @@ do
 		"-o" | "-output" | "--output")
 			shift
 			output_dir="$1"
+		;;
+
+		"-q")
+			shift
+			batch_queue="$1"
 		;;
 
 		*)
