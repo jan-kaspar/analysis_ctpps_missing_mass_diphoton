@@ -1,5 +1,18 @@
 #-Wl,-rpath=$(formats_dir)/CMSdataFormat/lib \
 
+#	-lflashggMetaData \
+#	-lflashggMicroAOD \
+#	-lflashggSystematics \
+#	-lflashggTaggers \
+#	-lflashggValidation \
+
+#	-lRecoEgammaEgammaTools \
+#	-lRecoEgammaElectronIdentification \
+#	-lRecoHIHiEgammaAlgos \
+#	-lRecoJetsJetProducers \
+#	-lRecoMETMETAlgorithms \
+#	-lRecoParticleFlowPFTracking \
+
 CLHEP_DIR = /cvmfs/cms.cern.ch/slc6_amd64_gcc530/external/clhep/2.3.1.1-giojec4
 
 all: distributions
@@ -17,17 +30,6 @@ distributions: distributions.cc common_input.h
 	-lDataFormatsFWLite \
 	-lDataFormatsCommon \
 	-lflashggDataFormats \
-	-lflashggMetaData \
-	-lflashggMicroAOD \
-	-lflashggSystematics \
-	-lflashggTaggers \
-	-lflashggValidation \
 	-lRecoBTagSoftLepton \
-	-lRecoEgammaEgammaTools \
-	-lRecoEgammaElectronIdentification \
-	-lRecoHIHiEgammaAlgos \
-	-lRecoJetsJetProducers \
-	-lRecoMETMETAlgorithms \
-	-lRecoParticleFlowPFTracking \
 	-lDataFormatsCandidate \
 	distributions.cc -o distributions
