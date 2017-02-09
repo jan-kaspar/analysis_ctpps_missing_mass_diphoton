@@ -1,0 +1,11 @@
+*.swp
+*.swo
+
+*.root
+*.pdf
+
+.*
+
+distributions
+
+output

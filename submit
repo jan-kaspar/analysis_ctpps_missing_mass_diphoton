@@ -1,0 +1,145 @@
+#!/bin/bash
+
+#----------------------------------------------------------------------------------------------------
+# defaults
+
+program=""
+
+input_list_file=""
+
+min_idx="0"
+step="0"
+groups="0"
+
+# ouput directory
+output_dir="output/batch"
+
+batch_queue="8nm"
+#batch_queue="1nh"
+
+batch_resources=""
+#batch_resources="pool>10000" # require more than 10 GB of space in the pool directory
+
+#batch_options=""
+batch_options="-o /dev/null -e /dev/null"
+
+#----------------------------------------------------------------------------------------------------
+
+function PrintUsage()
+{
+	echo "USAGE: submit [option] ..."
+	echo "OPTIONS:"
+	echo "    -h, --help"
+	echo "    -p, -program <program>, default: '$program'"
+	echo "    -input <file>, default: '$input_list_file'"
+	echo "    -min-idx <number>, default: '$min_idx'"
+	echo "    -step <number>, default: '$step'"
+	echo "    -groups <number>, default: '$groups'"
+	echo "    -o, -ouput <output dir>, default: '$output_dir'"
+}
+
+#----------------------------------------------------------------------------------------------------
+# parse input line
+
+while [ -n "$1" ]
+do
+	case "$1" in
+		"--help" | "-h")
+			PrintUsage
+			exit
+		;;
+
+		"-p" | "-program")
+			shift
+			program="$1"
+		;;
+
+		"-input")
+			shift
+			input_list_file="$1"
+		;;
+
+		"-min-idx")
+			shift
+			min_idx="$1"
+		;;
+
+		"-step")
+			shift
+			step="$1"
+		;;
+
+		"-groups")
+			shift
+			groups="$1"
+		;;
+
+		"-o" | "-output" | "--output")
+			shift
+			output_dir="$1"
+		;;
+
+		*)
+			echo "ERROR: argument '$1' not understood"
+			PrintUsage
+			exit 1
+		;;
+	esac
+
+	shift
+done
+
+#----------------------------------------------------------------------------------------------------
+# validate input line
+
+if [ ! -f "$program.cc" ]
+then
+	echo "ERROR: '$program' is not valid program."
+	PrintUsage
+	exit 1
+fi
+
+if [ ! -f "$input_list_file" ]
+then
+	echo "ERROR: '$input_list_file' is not a file."
+	PrintUsage
+	exit 2
+fi
+
+#----------------------------------------------------------------------------------------------------
+
+# prepare executable
+make "${program}" || exit 1
+
+# prepare output directory
+mkdir -p "$output_dir"
+rm -f $output_dir/${program}*.root
+rm -f $output_dir/${program}*.log_run
+rm -f $output_dir/${program}*.job
+
+for gr_num in `seq 1 $groups`
+do
+	let gr_idx=gr_num-1
+	let fi_idx_from=min_idx+gr_idx*step
+	let fi_idx_to=fi_idx_from+step-1
+
+	tag="${program}_${fi_idx_from}_${fi_idx_to}"
+	echo "* $tag"
+
+	job_file="$output_dir/${tag}.job"
+
+	# make job script
+	cat "job_template" | sed "
+			s|\$program|$program|g;
+			s|\$input_list_file|$input_list_file|g;
+			s|\$min_idx|$fi_idx_from|g;
+			s|\$max_idx|$fi_idx_to|g;	
+			s|\$output|$output_dir/$tag.root|g;	
+			s|\$log|$output_dir/$tag.log_run|g;	
+		" > "$job_file"
+
+	chmod a+x "$job_file"
+
+	# submit job
+	bsub -q "$batch_queue" -R "$batch_resources" $batch_options `pwd -P`"/$job_file"
+done

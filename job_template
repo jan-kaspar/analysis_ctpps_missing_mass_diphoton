@@ -1,0 +1,25 @@
+#!/bin/sh
+
+job_home=`pwd -P`
+export HOME="/afs/cern.ch/exp/totem/scratch/jkaspar"
+export RFIO_USE_CASTOR_V2=YES
+export STAGE_HOST=castorpublic
+export STAGE_SVCCLASS=default
+
+# CMSSW environment
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+cd "/afs/cern.ch/work/j/jkaspar/software/ctpps/flashgg/CMSSW_8_1_0/src"
+cmsenv
+
+# EOS configuration
+source "/afs/cern.ch/project/eos/installation/totem/etc/setup.sh"
+shopt -s expand_aliases
+
+# define directories
+job_dir="$job_home"
+anal_dir="/afs/cern.ch/work/j/jkaspar/analyses/ctpps/missing_mass/diphoton"
+
+# run the process
+cd "$anal_dir"
+
+{ time ./$program -input "$input_list_file" -min-idx "$min_idx" -max-idx "$max_idx" -output "$output" ; } &> "$log"
