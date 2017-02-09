@@ -188,7 +188,7 @@ int main(int argc, char **argv)
 
 	printf("> input files\n");
 	for (const auto &f : input_files)
-		printf("		%s\n", f.c_str());
+		printf("    %s\n", f.c_str());
 
 	fwlite::ChainEvent event(input_files);
 
@@ -210,7 +210,7 @@ int main(int argc, char **argv)
 	{
 		// get trigger data
 		fwlite::Handle<TriggerResults> triggerResults;
-			triggerResults.getByLabel(event, "TriggerResults", "", "HLT");
+		triggerResults.getByLabel(event, "TriggerResults", "", "HLT");
 
 		const TriggerNames &triggerNames = event.triggerNames(*triggerResults);
 
@@ -219,8 +219,15 @@ int main(int argc, char **argv)
 		for (const auto &tp : triggerPatterns)
 		{
 			signed int idx = triggerNames.triggerIndex(tp);
+
 			if (idx < 0)
 				continue;
+
+			int ssize = triggerResults->size();
+			if (idx >= ssize)
+				continue;
+
+			printf("idx = %i\n", idx);
 
 			if (triggerResults->accept(idx))
 			{
@@ -238,7 +245,6 @@ int main(int argc, char **argv)
 
 		for (unsigned int i = 0; i < diphpr->size(); i++)
 		{
-			//Ptr<flashgg::DiProtonDiPhotonCandidate> pc = diphpr->ptrAt(i);
 			const flashgg::DiProtonDiPhotonCandidate &pc = diphpr->at(i);
 	
 			// kinematics
