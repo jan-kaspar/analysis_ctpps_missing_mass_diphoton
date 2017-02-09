@@ -117,6 +117,15 @@ rm -f $output_dir/${program}*.root
 rm -f $output_dir/${program}*.log_run
 rm -f $output_dir/${program}*.job
 
+# write merge script
+merge_script="$output_dir/merge"
+(
+	echo "#!/bin/bash"
+	echo "hadd ${program}.root ${program}_*.root"
+) > "$merge_script"
+chmod u+x "$merge_script"
+
+# make and execute jobs
 for gr_num in `seq 1 $groups`
 do
 	let gr_idx=gr_num-1
